@@ -25,7 +25,8 @@
             <button onclick="showTab('basic')">基本情報</button>
             <button onclick="showTab('product')">製品情報</button>
             <button onclick="showTab('machine')">設備情報</button>
-            <button onclick="showTab('inspection')">中間・観察</button>
+            <button onclick="showTab('inspection')">中間検査</button>
+            <button onclick="showTab('observe')">作業観察</button>
         </div>
 
         <div class="container">
@@ -170,11 +171,138 @@
             </div>    
 
             <div id="machine" class="panel">
+
                 <h2>設備情報</h2>
+
+                <div id="stopArea">
+
+                    <div class="stopRow">
+
+                        <label>停止開始</label>
+                        <div class="timeBox">
+                            <input id="stopStart1" type="time" step="300">
+                            <button type="button" onclick="setNow('stopStart1')">現在時刻</button>
+                        </div>
+
+                        <label>停止終了</label>
+                        <div class="timeBox">
+                            <input id="stopEnd1" type="time" step="300">
+                            <button type="button" onclick="setNow('stopEnd1')">現在時刻</button>
+                        </div>
+
+                        <label>停止理由</label>
+                        <select>
+                            <option value="">選択してください</option>
+                            <option>段取</option>
+                            <option>設備故障</option>
+                            <option>計画停止</option>
+                            <option>その他</option>
+                        </select>
+
+                        <label>担当</label>
+                        <input type="text">
+
+                        <label>備考</label>
+                        <input type="text">
+
+                    </div>
+
+                </div>
+
+                <button type="button" onclick="addStop()">
+                    ＋ 停止時間追加
+                </button>
+
             </div>
 
             <div id="inspection" class="panel">
-                <h2>中間・観察</h2>
+
+                <h2>中間検査</h2>
+
+                <div id="inspectionArea">
+
+                    <div class="inspectionRow">
+
+                        <label>検査時間</label>
+                        <div class="timeBox">
+                            <input id="inspectionTime1" type="time" step="300">
+                            <button type="button" onclick="setNow('inspectionTime1')">現在時刻</button>
+                        </div>
+
+                        <label>RH重量</label>
+                        <div class="inputUnit">
+                            <input type="number">
+                            <span>g</span>
+                        </div>
+
+                        <label>LH重量</label>
+                        <div class="inputUnit">
+                            <input type="number">
+                            <span>g</span>
+                        </div>
+
+                        <label>スプール重量</label>
+                        <div class="inputUnit">
+                            <input type="number">
+                            <span>g</span>
+                        </div>
+
+                        <label>判定</label>
+                        <select>
+                            <option>OK</option>
+                            <option>NG</option>
+                        </select>
+
+                        <label>備考</label>
+                        <input type="text">
+
+                    </div>
+
+                </div>
+
+                <button type="button" onclick="addInspection()">
+                    ＋ 中間検査追加
+                </button>
+
+            </div>
+
+            <div id="observe" class="panel">
+
+                <h2>作業観察</h2>
+
+                <div id="observeArea">
+
+                    <div class="observeRow">
+
+                        <label>観察時間</label>
+                        <div class="timeBox">
+                            <input id="observeTime1" type="time" step="300">
+                            <button type="button" onclick="setNow('observeTime1')">現在時刻</button>
+                        </div>
+
+                        <label>作業者</label>
+                        <input type="text">
+
+                        <label>監督者</label>
+                        <input type="text">
+
+                        <label>判定</label>
+                        <select>
+                            <option>OK</option>
+                            <option>NG</option>
+                        </select>
+
+                        <label>備考</label>
+                        <input type="text">
+
+                    </div>
+
+                </div>
+
+                <button type="button" onclick="addObserve()">
+                    ＋ 作業観察追加
+                </button>
+
             </div>
 
         </div>

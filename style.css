@@ -63,7 +63,8 @@ header h1{
 
 #product,
 #machine,
-#inspection{
+#inspection,
+#observe{
     display: none;
 }
 

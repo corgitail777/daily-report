@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1.0">
+        <title>成形日報入力</title>
+
+        <link rel="stylesheet" href="style.css">
+    </head>
+
+    <body>
+        <header>
+            <h1>成形日報入力</h1>
+
+            <div class="headerButton">
+                <button>新規作成</button>
+                <button>呼び出し</button>
+                <button>保存</button>
+            </div>
+
+        </header>
+
+        <!--タブ-->
+        <div class="tabs">
+            <button onclick="showTab('basic')">基本情報</button>
+            <button onclick="showTab('product')">製品情報</button>
+            <button onclick="showTab('machine')">設備情報</button>
+            <button onclick="showTab('inspection')">中間・観察</button>
+        </div>
+
+        <div class="container">
+            <!--ここに後で各パネルを書く-->
+            <div id="basic" class="panel">
+                <h2>基本情報</h2>
+                <label>成形日</label>
+                <input type="date">
+
+                <label>担当者</label>
+                <input type="text">
+
+                <label>品番コード</label>
+                <input type="text">
+
+                <label>品目名称</label>
+                <input type="text">
+
+                <label>成形時間(開始)</label>
+                <div class="timeBox">
+                    <input id="startTime" type="time" step="300">
+                    <button type="button" onclick="setNow('startTime')">現在時刻</button>
+                </div>
+
+                <label>成形時間(終了)</label>
+                <div class="timeBox">
+                    <input id="endTime" type="time" step="300">
+                    <button type="button" onclick="setNow('endTime')">現在時刻</button>
+                </div>
+            
+                <label>サイクルタイム</label>
+                <div class="inputUnit">
+                    <input type="text">
+                    <span>秒</span>
+                </div>
+
+                <label>ショットカウンター</lavel>
+                <div class="inputUnit">
+                    <input type="text">
+                    <span>ショット</span>
+                </div>
+
+            </div>
+
+            <div id="product" class="panel">
+                <div id="productSet" class="productLayout">
+
+                    <h2>製品情報（SET）</h2>
+
+                    <label>SNP</label>
+                    <input id="snp" type="number" readonly>
+
+                    <hr>
+
+                    <label>箱数</label>
+
+                    <div class="input2">
+                        <div>
+                            <label>RH</label>
+                            <input id="boxRh" type="number">
+                        </div>
+
+                        <div>
+                            <label>LH</label>
+                            <input id="boxLh" type="number">
+                        </div>
+                    </div>
+
+                    <label>端数</label>
+
+                    <div class="input2">
+                        <div>
+                            <label>RH</label>
+                            <input id="pieceRh" type="number">
+                        </div>
+
+                        <div>
+                            <label>LH</label>
+                            <input id="pieceLh" type="number">
+                        </div>
+                    </div>
+
+                    <label>良品数（自動計算）</label>
+
+                    <div class="input2">
+                        <div>
+                            <label>RH</label>
+                            <input id="goodRh" type="number" readonly>
+                        </div>
+
+                        <div>
+                            <label>LH</label>
+                            <input id="goodLh" type="number" readonly>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <label>不良数（自動計算）</label>
+
+                    <div class="input2">
+                        <div>
+                            <label>RH</label>
+                            <input id="badRh" type="number" readonly>
+                        </div>
+
+                        <div>
+                            <label>LH</label>
+                            <input id="badLh" type="number" readonly>
+                        </div>
+                    </div>
+
+                    <h3>不良内容</h3>
+
+                    <div id="defectArea">
+
+                        <div class="defectRow">
+
+                            <select class="defectName">
+                                <option value="">選択してください</option>
+                                <option>ショート</option>
+                                <option>バリ</option>
+                                <option>キズ</option>
+                                <option>異物</option>
+                                <option>変形</option>
+                                <option>その他</option>
+                            </select>
+
+                            <input class="defectRh" type="number" placeholder="RH">
+
+                            <input class="defectLh" type="number" placeholder="LH">
+
+                        </div>
+
+                    </div>
+
+                    <button type="button" onclick="addDefect()">
+                        ＋ 不良追加
+                    </button>
+
+                </div>
+            </div>    
+
+            <div id="machine" class="panel">
+                <h2>設備情報</h2>
+            </div>
+
+            <div id="inspection" class="panel">
+                <h2>中間・観察</h2>
+            </div>
+
+        </div>
+
+    <script src="app.js"></script>
+    </body>
+</html>

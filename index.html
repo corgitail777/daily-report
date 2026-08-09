@@ -31,19 +31,24 @@
 
         <div class="container">
             <!--ここに後で各パネルを書く-->
+            <!--基本情報-->
             <div id="basic" class="panel">
                 <h2>基本情報</h2>
                 <label>成形日</label>
                 <input type="date">
 
                 <label>担当者</label>
-                <input type="text">
+                <select id="staffSelect">
+                    <option value="">選択してください</option>
+                </select>
 
                 <label>品番コード</label>
-                <input type="text">
+                <select id="productSelect" onchange="selectProduct()">
+                    <option value="">選択してください</option>
+                </select>
 
                 <label>品目名称</label>
-                <input type="text">
+                <input id="productName" type="text" readonly>
 
                 <label>成形時間(開始)</label>
                 <div class="timeBox">
@@ -71,7 +76,9 @@
 
             </div>
 
+            <!--製品情報-->
             <div id="product" class="panel">
+                <!--SET-->
                 <div id="productSet" class="productLayout">
 
                     <h2>製品情報（SET）</h2>
@@ -86,12 +93,12 @@
                     <div class="input2">
                         <div>
                             <label>RH</label>
-                            <input id="boxRh" type="number">
+                            <input id="boxRh" type="number" oninput="calcSetGood()">
                         </div>
 
                         <div>
                             <label>LH</label>
-                            <input id="boxLh" type="number">
+                            <input id="boxLh" type="number" oninput="calcSetGood()">
                         </div>
                     </div>
 
@@ -100,12 +107,12 @@
                     <div class="input2">
                         <div>
                             <label>RH</label>
-                            <input id="pieceRh" type="number">
+                            <input id="pieceRh" type="number" oninput="calcSetGood()">
                         </div>
 
                         <div>
                             <label>LH</label>
-                            <input id="pieceLh" type="number">
+                            <input id="pieceLh" type="number" oninput="calcSetGood()">
                         </div>
                     </div>
 
@@ -145,7 +152,7 @@
 
                         <div class="defectRow">
 
-                            <select class="defectName">
+                            <select id="defectNameSet" class="defectNameSet">
                                 <option value="">選択してください</option>
                                 <option>ショート</option>
                                 <option>バリ</option>
@@ -155,21 +162,85 @@
                                 <option>その他</option>
                             </select>
 
-                            <input class="defectRh" type="number" placeholder="RH">
+                            <input class="defectName" id="defectRhSet" type="number" placeholder="RH">
 
-                            <input class="defectLh" type="number" placeholder="LH">
+                            <input class="defectName" id="defectLhSet" type="number" placeholder="LH">
 
                         </div>
 
                     </div>
 
-                    <button type="button" onclick="addDefect()">
+                    <button type="button" onclick="addDefectSet()">
+                        ＋ 不良追加
+                    </button>
+
+                    <div id="defectListSet"></div>
+
+                </div>
+
+                <!--multi-->
+                <div id="productMulti" class="productLayout" style="display: none;">
+
+                    <h2>製品情報（MULTI）</h2>
+
+                    <label>SNP</label>
+                    <input id="snpMulti" type="number" readonly>
+
+                    <label>取数</label>
+                    <input id="cavityMulti" type="number" readonly>
+
+                    <hr>
+
+                    <label>箱数</label>
+                    <input id="boxMulti" type="number" oninput="calcMultiGood()">
+
+                    <label>端数</label>
+                    <input id="pieceMulti" type="number" oninput="calcMultiGood()">
+
+                    <label>良品数（自動計算）</label>
+                    <input id="goodMulti" type="number" readonly>
+
+                    <hr>
+
+                    <label>不良数（自動計算）</label>
+                    <input id="badMulti" type="number" readonly>
+
+                    <h3>不良内容</h3>
+
+                    <div id="defectAreaMulti">
+
+                        <div class="defectRowMulti">
+
+                            <select id="defectNameMulti" class="defectNameMulti">
+                                <option value="">選択してください</option>
+                                <option>ショート</option>
+                                <option>バリ</option>
+                                <option>キズ</option>
+                                <option>異物</option>
+                                <option>変形</option>
+                                <option>その他</option>
+                            </select>
+
+                            <input
+                                id="defectQtyMulti"
+                                class="defectQtyMulti"
+                                type="number"
+                                placeholder="数量">
+
+                        </div>
+
+                    </div>
+
+                    <button type="button" onclick="addDefectMulti()">
                         ＋ 不良追加
                     </button>
 
                 </div>
-            </div>    
+                <!-- 追加した不良をここに表示 -->
+                <div id="defectListMulti"></div>  
+            </div>
 
+            <!--設備情報-->
             <div id="machine" class="panel">
 
                 <h2>設備情報</h2>
@@ -215,6 +286,7 @@
 
             </div>
 
+            <!--中間検査-->
             <div id="inspection" class="panel">
 
                 <h2>中間検査</h2>
@@ -266,6 +338,7 @@
 
             </div>
 
+            <!--作業観察-->
             <div id="observe" class="panel">
 
                 <h2>作業観察</h2>

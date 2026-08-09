@@ -27,10 +27,9 @@ header h1{
 }
 
 .container{
-    display: grid;
-    grid-template-columns: repeat(4,1fr);
-    gap:15px;
+    width: 100%;
     padding: 20px;
+    box-sizing: border-box;
 }
 
 .panel{
@@ -38,6 +37,11 @@ header h1{
     border-radius: 10px;
     padding: 20px;
     box-shadow: 0 0 5px rgba(0,0,0,.15);
+
+    width: 80%;
+    max-width: 800px;
+    margin: 0 auto;
+    box-sizing: border-box;
 }
 
 .panel label{

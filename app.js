@@ -75,11 +75,12 @@ async function loadStaffMaster() {
 }
 
 
-// ページを開いたら担当者マスターを読み込む
+// ページを開いたら担当者、製品、設備マスターを読み込む
 window.addEventListener("DOMContentLoaded", function () {
 
     loadStaffMaster();
     loadProductMaster();
+    loadMachineMaster();
 
 });
 
@@ -111,7 +112,8 @@ async function loadProductMaster() {
             tolerance: columns[5].trim(),
             cavity: columns[6].trim(),
             material: columns[7].trim(),
-            cycle: columns[8].trim()
+            cycle: columns[8].trim(),
+            machine: columns[9].trim()
         };
 
         productMaster.push(product);
@@ -186,7 +188,54 @@ function selectProduct() {
     document.getElementById("kgTsuika").value = "";
     document.getElementById("kgEnd").value = "";
 
+    //製品マスターに設備が入ってたら設備情報に入れる
+    if (product.machine !== "") {
+
+        document.getElementById("machineSelect").value =
+        product.machine;
+    }
     console.log("TYPE:", product.type);
+
+}
+
+
+//設備マスタープルダウン
+async function loadMachineMaster() {
+
+    const response = await fetch("machine_master.csv");
+    const text = await response.text();
+
+    const lines = text.trim().split(/\r?\n/);
+
+    const select =
+        document.getElementById("machineSelect");
+
+    window.machineMaster = [];
+
+    for (let i = 1; i < lines.length; i++) {
+
+        if (lines[i].trim() === "") {
+            continue;
+        }
+
+        const columns = lines[i].split(",");
+
+        const machine = {
+            name: columns[0].trim(),
+            ton: columns[1].trim(),
+            number: columns[2].trim()
+        };
+
+        machineMaster.push(machine);
+
+        const option =
+            document.createElement("option");
+
+        option.value = machine.name;
+        option.textContent = machine.name;
+
+        select.appendChild(option);
+    }
 }
 
 
@@ -1093,4 +1142,507 @@ function calcMaterial() {
 
     document.getElementById("kgEnd").value =
         end.toFixed(2);
+}
+
+
+//日報保存処理
+function saveReport() {
+
+    // 製品選択
+    const productCode =
+        document.getElementById("productSelect").value;
+
+    const product =
+        productMaster.find(item =>
+            item.productCode === productCode
+        );
+
+    if (!product) {
+        alert("製品を選択してください");
+        return;
+    }
+
+
+    // 担当者
+    const staffSelect =
+        document.getElementById("staffSelect");
+
+    const staffName =
+        staffSelect.selectedOptions[0]?.text ?? "";
+
+   // 設備
+    const machineSelect =
+        document.getElementById("machineSelect");
+
+    const machineName =
+        machineSelect.selectedOptions[0]?.text ?? "";
+
+
+    // 日報IDを作成
+    const reportId =
+        crypto.randomUUID();
+
+
+    //setかmulti判断で製品情報格納
+    let productData = {};
+
+    if (product.type === "SET") {
+
+        productData = {
+            type: "SET",
+
+            snp: document.getElementById("snp").value,
+
+            boxRh: document.getElementById("boxRh").value,
+            boxLh: document.getElementById("boxLh").value,
+
+            pieceRh: document.getElementById("pieceRh").value,
+            pieceLh: document.getElementById("pieceLh").value,
+
+            goodRh: document.getElementById("goodRh").value,
+            goodLh: document.getElementById("goodLh").value,
+
+            badRh: document.getElementById("badRh").value,
+            badLh: document.getElementById("badLh").value,
+
+            weightRh: document.getElementById("rweightSet").value,
+            weightLh: document.getElementById("lweightSet").value,
+            spoolWeight: document.getElementById("spoolSet").value
+        };
+
+    } else if (product.type === "MULTI") {
+
+        productData = {
+            type: "MULTI",
+
+            snp: document.getElementById("snpMulti").value,
+            cavity: document.getElementById("cavityMulti").value,
+
+            box: document.getElementById("boxMulti").value,
+            piece: document.getElementById("pieceMulti").value,
+
+            good: document.getElementById("goodMulti").value,
+            bad: document.getElementById("badMulti").value,
+
+            weight: document.getElementById("weightMulti").value,
+            spoolWeight: document.getElementById("spoolMulti").value
+        };
+    }
+
+    // 日報1件分をまとめる
+    const report = {
+
+        reportId: reportId,
+
+        basic: {
+            date: document.getElementById("reportDate").value,
+            staff: staffName,
+            machine: machineName,
+            productCode: product.productCode,
+            productName: product.productName,
+            type: product.type,
+            shotCounter: document.getElementById("shotCounter").value,
+            startTime: document.getElementById("startTime").value,
+            endTime: document.getElementById("endTime").value
+        },
+
+        product: productData,
+
+        material: {
+            dango: document.getElementById("kgDango").value,
+            junbi: document.getElementById("kgJunbi").value,
+            tsuika: document.getElementById("kgTsuika").value,
+            end: document.getElementById("kgEnd").value
+        },
+
+        defectsSet: defectRecordsSet,
+        defectsMulti: defectRecordsMulti,
+
+        machines: machineRecords,
+
+        inspections: inspectionRecords,
+
+        observations: observeRecords,
+
+        savedAt: new Date().toISOString()
+    };
+
+
+    // 既に保存されている日報一覧を取得
+    const reports =
+        JSON.parse(localStorage.getItem("dailyReports")) || [];
+
+
+    // 今の日報を追加
+    reports.push(report);
+
+
+    // localStorageへ正式保存
+    localStorage.setItem(
+        "dailyReports",
+        JSON.stringify(reports)
+    );
+
+
+    alert("日報を保存しました");
+}
+
+
+//日報呼び出し画面
+function openLoadModal() {
+
+    document.getElementById("loadModal").style.display = "block";
+
+    createYearList();
+}
+
+//呼び出し画面閉じ
+function closeLoadModal() {
+
+    document.getElementById("loadModal").style.display = "none";
+}
+
+//検索用の年リスト作成
+function createYearList() {
+
+    const reports =
+        JSON.parse(localStorage.getItem("dailyReports")) || [];
+
+    const yearSelect =
+        document.getElementById("searchYear");
+
+    yearSelect.innerHTML = "";
+
+    const years = [];
+
+    reports.forEach(function(report) {
+
+        const date =
+            new Date(report.basic.date);
+
+        const year =
+            date.getFullYear();
+
+        if (!years.includes(year)) {
+            years.push(year);
+        }
+    });
+
+    years.sort();
+
+    years.forEach(function(year) {
+
+        const option =
+            document.createElement("option");
+
+        option.value = year;
+        option.textContent = year + "年";
+
+        yearSelect.appendChild(option);
+    });
+
+
+    // 今月を初期選択
+    const now = new Date();
+
+    yearSelect.value = now.getFullYear();
+
+    document.getElementById("searchMonth").value =
+        now.getMonth() + 1;
+}
+
+//日報検索
+function searchReports() {
+
+    const year =
+        Number(document.getElementById("searchYear").value);
+
+    const month =
+        Number(document.getElementById("searchMonth").value);
+
+    const reports =
+        JSON.parse(localStorage.getItem("dailyReports")) || [];
+
+    const result =
+        reports.filter(function(report) {
+
+            const date =
+                new Date(report.basic.date);
+
+            return (
+                date.getFullYear() === year &&
+                date.getMonth() + 1 === month
+            );
+        });
+
+
+    displayReportList(result);
+}
+
+//一覧表示
+function displayReportList(reports) {
+
+    const list =
+        document.getElementById("reportList");
+
+    list.innerHTML = "";
+
+    if (reports.length === 0) {
+
+        list.textContent =
+            "該当する日報はありません";
+
+        return;
+    }
+
+
+    reports.forEach(function(report) {
+
+        const row =
+            document.createElement("div");
+
+        row.className = "reportRecord";
+
+
+        const text =
+            document.createElement("span");
+
+        text.textContent =
+            report.basic.date +
+            "　" +
+            report.basic.machine +
+            "　" +
+            report.basic.productCode +
+            "　" +
+            report.basic.productName +
+            "　担当:" +
+            report.basic.staff;
+
+
+        const openButton =
+            document.createElement("button");
+
+        openButton.type = "button";
+        openButton.textContent = "開く";
+
+        openButton.onclick = function () {
+            loadReport(report.reportId);
+        };
+
+
+        row.appendChild(text);
+        row.appendChild(openButton);
+
+        list.appendChild(row);
+    });
+}
+
+//一覧から選んだ日報を拾う
+function loadReport(reportId) {
+
+    // 保存済み日報を全部取得
+    const reports =
+        JSON.parse(localStorage.getItem("dailyReports")) || [];
+
+    // reportIdが一致する日報を探す
+    const report =
+        reports.find(function(item) {
+            return item.reportId === reportId;
+        });
+
+    // 見つからなかった
+    if (!report) {
+        alert("日報が見つかりません");
+        return;
+    }
+
+    //入力画面初期化
+    clearReportForm()
+
+    // 基本情報を画面に戻す
+    document.getElementById("reportDate").value =
+        report.basic.date;
+
+    document.getElementById("staffSelect").value =
+        report.basic.staffId;  // ← ID保存してる場合
+
+
+    document.getElementById("productSelect").value =
+        report.basic.productCode;
+
+    // 製品選択時の処理を実行
+    selectProduct();
+
+
+    document.getElementById("startTime").value =
+        report.basic.startTime;
+
+    document.getElementById("endTime").value =
+        report.basic.endTime;
+
+
+    // 設備
+    document.getElementById("machineSelect").value =
+        report.machineName;
+
+
+    // 材料
+    document.getElementById("kgDango").value =
+        report.material.dango;
+
+    document.getElementById("kgJunbi").value =
+        report.material.junbi;
+
+    document.getElementById("kgTsuika").value =
+        report.material.tsuika;
+
+    document.getElementById("kgEnd").value =
+        report.material.end;
+
+
+
+    if (report.basic.type === "SET") {
+        //製品情報set
+        defectRecordsSet.length = 0;
+
+        report.defectsSet.forEach(function(record) {
+            defectRecordsSet.push(record);
+
+        document.getElementById("goodRh").value =
+            report.product.goodRh;
+
+        document.getElementById("goodLh").value =
+            report.product.goodLh;
+        
+            document.getElementById("rweightSet").value =
+            report.product.weightRh;
+        
+        document.getElementById("lweightSet").value =
+            report.product.weightLh;
+        
+        document.getElementById("spoolSet").value =
+            report.product.spoolWeight;
+
+        document.getElementById("boxRh").value =
+            report.product.boxRh;
+
+        document.getElementById("boxLh").value =
+            report.product.boxLh;
+        });
+
+        displayDefectSet();
+        }
+        else if (report.basic.type === "MULTI") {
+        //製品情報multi
+        defectRecordsMulti.length = 0;
+
+        report.defectsMulti.forEach(function(record) {
+            defectRecordsMulti.push(record);
+
+        document.getElementById("goodMulti").value =
+            report.product.good;
+
+        document.getElementById("weightMulti").value =
+            report.product.weight;
+        
+        document.getElementById("spoolMulti").value =
+            report.product.spoolWeight;
+        
+        document.getElementById("cavityMulti").value =
+            report.product.cavity;
+
+        document.getElementById("boxMulti").value =
+            report.product.box;
+
+        document.getElementById("pieceMulti").value =
+            report.product.piece;
+        });
+
+        displayDefectMulti();
+    }
+
+    //設備情報復活
+    machineRecords.length = 0;
+
+    report.machines.forEach(function(record) {
+        machineRecords.push(record);
+    });
+
+    displayStop();
+
+    //中間検査復活
+    inspectionRecords.length = 0;
+
+    report.inspections.forEach(function(record) {
+        inspectionRecords.push(record);
+    });
+
+    displayInspection();
+
+    //作業観察復活
+    observeRecords.length = 0;
+
+    report.observations.forEach(function(record) {
+        observeRecords.push(record);
+    });
+
+    displayOvserve();
+
+
+
+
+
+    // モーダルを閉じる
+    closeLoadModal();
+}
+
+
+//入力画面初期化
+function clearReportForm() {
+
+    // 基本情報
+    document.getElementById("reportDate").value = "";
+    document.getElementById("staffSelect").value = "";
+    document.getElementById("productSelect").value = "";
+    document.getElementById("startTime").value = "";
+    document.getElementById("endTime").value = "";
+
+    // 設備
+    document.getElementById("machineSelect").value = "";
+
+    // 材料
+    document.getElementById("kgDango").value = "";
+    document.getElementById("kgJunbi").value = "";
+    document.getElementById("kgTsuika").value = "";
+    document.getElementById("kgEnd").value = "";
+
+    // SET
+    document.getElementById("boxRh").value = "";
+    document.getElementById("boxLh").value = "";
+    document.getElementById("pieceRh").value = "";
+    document.getElementById("pieceLh").value = "";
+    document.getElementById("goodRh").value = "";
+    document.getElementById("goodLh").value = "";
+    document.getElementById("badRh").value = "";
+    document.getElementById("badLh").value = "";
+
+    // MULTI
+    document.getElementById("boxMulti").value = "";
+    document.getElementById("pieceMulti").value = "";
+    document.getElementById("goodMulti").value = "";
+    document.getElementById("badMulti").value = "";
+
+    // レコード配列も空にする
+    defectRecordsSet.length = 0;
+    defectRecordsMulti.length = 0;
+    machineRecords.length = 0;
+    inspectionRecords.length = 0;
+    observeRecords.length = 0;
+
+    // 一覧表示も消す
+    displayDefectSet();
+    displayDefectMulti();
+    displayStop();
+    displayInspection();
+    displayOvserve(); // ← 実際の関数名に合わせる
 }

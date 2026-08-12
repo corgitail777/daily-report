@@ -64,7 +64,7 @@
             
                 <label>サイクルタイム</label>
                 <div class="inputUnit">
-                    <input type="text">
+                    <input id="cycle" type="text">
                     <span>秒</span>
                 </div>
 
@@ -73,6 +73,30 @@
                     <input type="text">
                     <span>ショット</span>
                 </div>
+
+              <label>ダンゴ</lavel>
+                <div class="inputUnit">
+                    <input id="kgDango" type="text" oninput="calcMaterial()">
+                    <span>kg</span>
+                </div>
+
+                <label>準備</lavel>
+                <div class="inputUnit">
+                    <input id="kgJunbi" type="text" oninput="calcMaterial()">
+                    <span>kg</span>
+                </div>
+
+                <label>追加</lavel>
+                <div class="inputUnit">
+                    <input id="kgTsuika" type="text" oninput="calcMaterial()">
+                    <span>kg</span>
+                </div>
+
+                <label>終了</lavel>
+                <div class="inputUnit">
+                    <input id="kgEnd" type="text" readonly>
+                    <span>kg</span>
+                </div>  
 
             </div>
 
@@ -85,6 +109,15 @@
 
                     <label>SNP</label>
                     <input id="snp" type="number" readonly>
+
+                    <label>RH重量</label>
+                    <input id="rweightSet" type="number">
+
+                    <label>LH重量</label>
+                    <input id="lweightSet" type="number">
+
+                    <label>スプール重量</label>
+                    <input id="spoolSet" type="number">
 
                     <hr>
 
@@ -186,8 +219,14 @@
                     <label>SNP</label>
                     <input id="snpMulti" type="number" readonly>
 
+                    <label>重量</label>
+                    <input id="weightMulti" type="number">
+
+                    <label>スプール重量</label>
+                    <input id="spoolMulti" type="number">
+
                     <label>取数</label>
-                    <input id="cavityMulti" type="number" readonly>
+                    <input id="cavityMulti" type="number">
 
                     <hr>
 
@@ -234,10 +273,12 @@
                     <button type="button" onclick="addDefectMulti()">
                         ＋ 不良追加
                     </button>
+                    
+                    <!-- 追加した不良をここに表示 -->
+                    <div id="defectListMulti"></div>  
 
                 </div>
-                <!-- 追加した不良をここに表示 -->
-                <div id="defectListMulti"></div>  
+
             </div>
 
             <!--設備情報-->
@@ -262,7 +303,7 @@
                         </div>
 
                         <label>停止理由</label>
-                        <select>
+                        <select id="stopReason">
                             <option value="">選択してください</option>
                             <option>段取</option>
                             <option>設備故障</option>
@@ -270,21 +311,28 @@
                             <option>その他</option>
                         </select>
 
-                        <label>担当</label>
-                        <input type="text">
+                        <label>担当者</label>
+                        <select id="manager">
+                            <option value="">選択してください</option>
+                        </select>
 
                         <label>備考</label>
-                        <input type="text">
+                        <input id="remarks" type="text">
 
                     </div>
 
+                    
                 </div>
 
                 <button type="button" onclick="addStop()">
                     ＋ 停止時間追加
                 </button>
+                
+                <div id="machineList"></div>
 
+                
             </div>
+
 
             <!--中間検査-->
             <div id="inspection" class="panel">
@@ -301,32 +349,52 @@
                             <button type="button" onclick="setNow('inspectionTime1')">現在時刻</button>
                         </div>
 
-                        <label>RH重量</label>
-                        <div class="inputUnit">
-                            <input type="number">
-                            <span>g</span>
-                        </div>
+                        <!--set時-->
+                        <div id="inspectionSet" class="inspection">
+                            <label>RH重量</label>
+                            <div class="inputUnit">
+                                <input id="weightRh" type="number">
+                                <span>g</span>
+                            </div>
 
-                        <label>LH重量</label>
-                        <div class="inputUnit">
-                            <input type="number">
-                            <span>g</span>
+                            <label>LH重量</label>
+                            <div class="inputUnit">
+                                <input id="weightLh" type="number">
+                                <span>g</span>
+                            </div>
+
+                        </div>
+                        
+                        <!--multi-->
+                        <div id="inspectionMulti" class="inspection" style="display: none;">
+                            <label>重量</label>
+                            <div class="inputUnit">
+                                <input id="inspectionWeightMulti" type="number">
+                                <span>g</span>
+                            </div>
+
                         </div>
 
                         <label>スプール重量</label>
                         <div class="inputUnit">
-                            <input type="number">
+                            <input id="weightSpool" type="number">
                             <span>g</span>
                         </div>
-
+                        
                         <label>判定</label>
-                        <select>
+                        <select id="judge">
+                            <option value="">選択してください</option>
                             <option>OK</option>
                             <option>NG</option>
                         </select>
 
+                        <label>担当者</label>
+                        <select id="inspectionStaff">
+                            <option value="">選択してください</option>
+                        </select>
+
                         <label>備考</label>
-                        <input type="text">
+                        <input id="inspectionRemarks" type="text">
 
                     </div>
 
@@ -335,8 +403,12 @@
                 <button type="button" onclick="addInspection()">
                     ＋ 中間検査追加
                 </button>
-
+                
+                <div id="inspectionList"></div>
+            
             </div>
+
+
 
             <!--作業観察-->
             <div id="observe" class="panel">
@@ -354,19 +426,24 @@
                         </div>
 
                         <label>作業者</label>
-                        <input type="text">
+                        <select id="observeStaff">
+                            <option value="">選択してください</option>
+                        </select>
 
                         <label>監督者</label>
-                        <input type="text">
+                        <select id="supervisorStaff">
+                            <option value="">選択してください</option>
+                        </select>
 
                         <label>判定</label>
-                        <select>
+                        <select id="result">
+                            <option value="">選択してください</option>
                             <option>OK</option>
                             <option>NG</option>
                         </select>
 
                         <label>備考</label>
-                        <input type="text">
+                        <input id="observeRemark" type="text">
 
                     </div>
 
@@ -376,6 +453,7 @@
                     ＋ 作業観察追加
                 </button>
 
+                <div id="observeList"></div>
             </div>
 
         </div>

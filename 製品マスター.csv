@@ -1,3 +1,4 @@
 ﻿productCode,productName,type,snp,referenceWeight,tolerance,cavity,material,cycle,machine
 9618730,LENS OUTER,MULTI,20,140,2,1,V2200,68,A-4
-72721-33F-0035,GARNISH,SET,18,323,5,2,スミストラン,33,
+72721-33F-0035,GARNISH,SET,18,323,5,2,スミストラン,33,A-3
+WB100040,操作部パネル,MULTI,12,387.5,5,1,UMGダイヤラックKD100W,70,A-1
